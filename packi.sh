@@ -29,23 +29,43 @@ for i in $(seq 1 $num_repos); do
 
   # Check if the repository is private or public
   repo_type=$(curl -I $repo_url | grep "Status" | awk '{print $2}')
+
+  # Display the results in a beautified manner
+  echo "============================================================="
+  echo "Repository $i: $repo_name"
+  echo "-------------------------------------------------------------"
+  echo "Packages found:"
+  for package in $packages; do
+    echo " - $package"
+  done
+  echo "-------------------------------------------------------------"
   if [ $repo_type == "200" ]; then
-    # The repository is public, so save the packages to public.txt
+    # The repository is public
+    echo "Repository type: Public"
+    echo "Packages saved to public.txt"
+    # Save the packages to public.txt
     echo "Packages found in public repository $i ($repo_name):" >> ../public.txt
     for package in $packages; do
       echo " - $package" >> ../public.txt
     done
   else
-    # The repository is private, so save the packages to private.txt
+    # The repository is private
+    echo "Repository type: Private"
+    echo "Packages saved to private.txt"
+    # Save the packages to private.txt
     echo "Packages found in private repository $i ($repo_name):" >> ../private.txt
     for package in $packages; do
       echo " - $package" >> ../private.txt
     done
   fi
+  echo "-------------------------------------------------------------"
 
-  # Go back to the parent directory
-  cd ..
-done
+  # Run trufflehog on the repository
+  echo "Running trufflehog on repository $i ($repo_name)..."
+  trufflehog_output=$(trufflehog --entropy=False --json --rules --regex)
 
-echo "Private packages have been saved to private.txt"
-echo "Public packages have been saved to public.txt"
+  # Save the trufflehog output to a file
+  echo $trufflehog_output >> ../$repo_name.txt
+
+  echo "Trufflehog output saved to $repo_name.txt"
+  echo "================================
