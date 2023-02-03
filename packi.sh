@@ -58,14 +58,11 @@ for i in $(seq 1 $num_repos); do
       echo " - $package" >> ../private.txt
     done
   fi
-  echo "-------------------------------------------------------------"
+  echo "============================================================="
 
-  # Run trufflehog on the repository
-  echo "Running trufflehog on repository $i ($repo_name)..."
-  trufflehog_output=$(trufflehog --entropy=False --json --rules --regex)
+  # Go back to the parent directory
+  cd ..
+done
 
-  # Save the trufflehog output to a file
-  echo $trufflehog_output >> ../$repo_name.txt
-
-  echo "Trufflehog output saved to $repo_name.txt"
-  echo "================================
+echo "Private packages have been saved to private.txt"
+echo "Public packages have been saved to public.txt"
